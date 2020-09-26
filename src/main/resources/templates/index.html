@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Library</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <table class="table table-striped table-dark">
+            <thead>
+            <tr>
+                <th scope="col">Kitap Adı</th>
+                <th scope="col">Yazar</th>
+                <th scope="col">Yayın Evi</th>
+                <th scope="col">İşlem</th>
+
+            </tr>
+            </thead>
+            <tbody th:each="book : ${bookList}">
+            <tr>
+                <td th:id="'bookName' + ${book.id}"  th:text="${book.bookName}"></td>
+                <td th:id="'authorName' + ${book.id}"  th:text="${book.author.authorName}"></td>
+                <td th:id="'publisherName' + ${book.id}" th:text="${book.publisher.publisherName}"></td>
+                <td >
+                    <a th:onclick="'javascript:deleteBook(\''+ ${book.id} +'\');'"  class="btn btn-secondary"><span class="badge badge-primary badge-pill">X</span></a>
+                    <a th:onclick="'javascript:getBook(\''+ ${book.id} +'\');'"  class="btn btn-secondary"><span class="badge badge-primary badge-pill"  data-toggle="modal" data-target="#exampleModal">X</span></a>
+
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        <form>
+                            <div class="form-group">
+                                <label for="bookName">Book Name</label>
+                                <input type="text" class="form-control" id="bookName" aria-describedby="emailHelp" placeholder="Book Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="AuthorName">Author Name</label>
+                                <input type="text" class="form-control" id="authorName" aria-describedby="emailHelp" placeholder="Author Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="PublisherName">Publisher Name</label>
+                                <input type="text" class="form-control" id="publisherName" aria-describedby="emailHelp" placeholder="Publisher Name">
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" th:onclick="'javascript:updateBook();'" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+<script>
+    var localId;
+    function deleteBook(id)
+    {
+        const element=event.target;
+
+        debugger;
+        $.ajax({
+            method: "GET",
+            url: "http://localhost:8080/deleteBook/"+id,
+            success: function (data) {
+                $(element).parents('tr').remove();
+
+            }
+
+        });
+    }
+    function getBook(id)
+    {
+        localId=id;
+
+        $.ajax({
+            method: "GET",
+            url: "http://localhost:8080/getBook/"+id,
+            success: function (data) {
+                console.log("Açıldı")
+                debugger;
+                $('#bookName').val(data.bookName);
+                $('#authorName').val(data.authorName);
+                $('#publisherName').val(data.publisherName);
+
+            }
+
+        });
+    }
+
+    function updateBook()
+    {
+
+        $.ajax({
+            method: "POST",
+            url: "http://localhost:8080/updateBook/"+localId,
+            data: {
+                bookName: $("#bookName").val(),
+                authorName: $("#authorName").val(),
+                publisherName:$("#publisherName").val()
+            },
+            success: function (data) {
+                $('#bookName'+localId).html($("#bookName").val());
+                $('#authorName'+localId).html($("#authorName").val());
+                $('#publisherName'+localId).html($("#publisherName").val());
+                $('#exampleModal').modal('hide')
+
+
+
+
+            }
+
+        });
+    }
+
+</script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+</body>
+</html>
